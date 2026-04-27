@@ -15,7 +15,7 @@ class Question(db.Model):
     question_type = db.Column(db.String(10), nullable=False)
     city_name = db.Column(db.String(100))
     latitude = db.Column(db.Float)
-    longitude = db.Column(db.Float)
+    longitude = db.Column(db.Float) # на всякий если дисон будет плох
 
 class Session(db.Model):
     __tablename__ = 'sessions'
