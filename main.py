@@ -16,3 +16,11 @@ class Question(db.Model):
     city_name = db.Column(db.String(100))
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
+
+class Session(db.Model):
+    __tablename__ = 'sessions'
+    
+    user_id = db.Column(db.String(50), primary_key=True)
+    score = db.Column(db.Integer, default=0)
+    current_question_index = db.Column(db.Integer, default=0)
+    total_questions = db.Column(db.Integer, nullable=False)
