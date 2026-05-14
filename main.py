@@ -424,4 +424,26 @@ def handle_answer(user_session, user_input):
             tts=feedback_tts + ' ' + result_text,
             buttons=['Сыграть ещё раз', 'Выйти'],
             image_id=IMAGES['result'],
+    ))
+ 
+ 
+@app.route('/health', methods=['GET'])
+def health():
+    """Проверка работоспособности сервера."""
+    return jsonify({'status': 'ok', 'service': 'Marvel Quiz Alice Skill'})
+ 
+ 
+if __name__ == '__main__':
+    with app.app_context():
+        init_db()
+        # Загружаем вопросы из JSON, если БД пуста
+        if Question.query.count() == 0:
+            load_questions_from_json('questions.json')
+            logger.info('Вопросы загружены из questions.json')
+        else:
+            logger.info(f'В БД уже {Question.query.count()} вопросов')
+ 
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
+ 
     
