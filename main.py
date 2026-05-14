@@ -274,5 +274,47 @@ def handle_mode_choice(user_session, user_input):
         return jsonify(make_response('Не удалось загрузить вопросы. Попробуй позже!'))
 
     return ask_question(user_session, question, first=True)
+def handle_answer(user_session, user_input):
+    """Обработка ответа пользователя на вопрос."""
+    question = GameLogic.get_current_question(user_session)
+    if not question:
+        return finalize_game(user_session)
 
+    is_correct = GameLogic.check_answer(question, user_input)
+
+    if is_correct:
+        user_session.score += 1
+        feedback_text = GameLogic.get_correct_feedback()
+        feedback_tts = SOUNDS['correct'] + feedback_text
+        img_id = IMAGES['correct']
+    else:
+        correct_ans = question.correct_answer
+        feedback_text = GameLogic.get_wrong_feedback(correct_ans)
+        feedback_tts = SOUNDS['wrong'] + feedback_text
+        img_id = IMAGES['wrong']
+
+    # Показываем карту для вопросов о городах
+    extra_card = None
+    map_info = ''
+    if question.question_type == 'city' and question.latitude and question.longitude:
+        map_url = get_static_map_url(question.latitude, question.longitude, question.city_name)
+        if map_url:
+            map_info = f'\n🗺️ {question.city_name} на карте!'
+            # Для карты используем текстовое описание (Static API — внешняя ссылка)
+            feedback_text += f'\n\nГород {question.city_name}: {map_url}'
+
+    # Переходим к следующему вопросу
+    user_session.current_question_index += 1
+    db.session.commit()
+
+    # Проверяем, есть ли ещё вопросы
+    questions_list = json.loads(user_session.questions_json)
+    if user_session.current_question_index >= len(questions_list):
+        # Игра завершена — показываем фидбек и результат
+        result_text = finalize_text(user_session, feedback_text)
+        return jsonify(make_response(
+            result_text,
+            tts=feedback_tts + ' ' + result_text,
+            buttons=['Сыграть ещё раз', 'Выйти'],
+            image_id=IMAGES['result'],
     
