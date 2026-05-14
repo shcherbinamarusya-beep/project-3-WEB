@@ -104,15 +104,125 @@ def webhook():
                     image_id=IMAGES['marvel']
                 ))
 
-
-        if is_new_session or user
-[С
-_list)}'
+        if is_new_session or user_session.state == 'idle':
+            return handle_welcome(user_session)
+ 
+        elif user_session.state == 'choosing_mode':
+            return handle_mode_choice(user_session, user_input)
+ 
+        elif user_session.state == 'playing':
+            return handle_answer(user_session, user_input)
+ 
+        elif user_session.state == 'asking_replay':
+            return handle_replay(user_session, user_input)
+ 
+        else:
+            user_session.state = 'idle'
+            db.session.commit()
+            return handle_welcome(user_session)
+ 
+    except Exception as e:
+        logger.error(f"Ошибка обработки запроса: {e}", exc_info=True)
+        return jsonify(make_response(
+            'Произошла ошибка. Попробуй ещё раз!',
+            buttons=['Начать заново']
         ))
+ 
+ 
+def handle_welcome(user_session):
+    """Приветствие и выбор режима игры."""
+    tts_intro = SOUNDS['intro']
+    text = (
+        'Добро пожаловать в викторину по вселенной Marvel! '
+        'Тебя ждут вопросы о героях, злодеях и городах киновселенной. '
+        'За каждый правильный ответ — 1 очко. '
+        'Выбери режим игры: 5 или 10 вопросов?'
+    )
+    tts = tts_intro + text
+ 
+    user_session.state = 'choosing_mode'
+    db.session.commit()
+ 
+    return jsonify(make_response(
+        text, tts=tts,
+        buttons=['5 вопросов', '10 вопросов'],
+        image_id=IMAGES['welcome'],
+        image_title='Marvel Quiz',
+        image_desc='Проверь свои знания о вселенной Marvel!'
+    ))
+ 
+ 
+def handle_mode_choice(user_session, user_input):
+    """Обработка выбора режима (5 или 10 вопросов)."""
+    if '10' in user_input or 'десять' in user_input:
+        mode = 10
+    elif '5' in user_input or 'пять' in user_input:
+        mode = 5
+    else:
+        return jsonify(make_response(
+            'Не понял выбор. Скажи "5 вопросов" или "10 вопросов".',
+            buttons=['5 вопросов', '10 вопросов']
+        ))
+ 
+    GameLogic.start_game(user_session, mode)
+    db.session.commit()
+ 
+    question = GameLogic.get_current_question(user_session)
+    if not question:
+        return jsonify(make_response('Не удалось загрузить вопросы. Попробуй позже!'))
+ 
+    return ask_question(user_session, question, first=True)
+ 
+ 
+def handle_answer(user_session, user_input):
+    """Обработка ответа пользователя на вопрос."""
+    question = GameLogic.get_current_question(user_session)
+    if not question:
+        return finalize_game(user_session)
+ 
+    is_correct = GameLogic.check_answer(question, user_input)
+ 
+    if is_correct:
+        user_session.score += 1
+        feedback_text = GameLogic.get_correct_feedback()
+        feedback_tts = SOUNDS['correct'] + feedback_text
+        img_id = IMAGES['correct']
+    else:
+        correct_ans = question.correct_answer
+        feedback_text = GameLogic.get_wrong_feedback(correct_ans)
+        feedback_tts = SOUNDS['wrong'] + feedback_text
+        img_id = IMAGES['wrong']
+ 
+    
+    extra_card = None
+    map_info = ''
+    if question.question_type == 'city' and question.latitude and question.longitude:
+        map_url = get_static_map_url(question.latitude, question.longitude, question.city_name)
+        if map_url:
+            map_info = f'\n🗺️ {question.city_name} на карте!'
+            feedback_text += f'\n\nГород {question.city_name}: {map_url}'
+ 
+    
+    user_session.current_question_index += 1
+    db.session.commit()
+ 
+
+    questions_list = json.loads(user_session.questions_json)
+    if user_session.current_question_index >= len(questions_list):
+        result_text = finalize_text(user_session, feedback_text)
+        return jsonify(make_response(
+            result_text,
+            tts=feedback_tts + ' ' + result_text,
+            buttons=['Сыграть ещё раз', 'Выйти'],
+            image_id=IMAGES['result'],
+            image_title=f'Результат: {user_session.score} из {len(questions_list)}'
+        ))
+ 
 
     next_question = GameLogic.get_current_question(user_session)
     return ask_question(user_session, next_question, preamble=feedback_text, preamble_tts=feedback_tts)
-
+ 
+        
 def handle_replay(user_session, user_input):
     """Обработка запроса на повторную игру."""
     if any(w in user_input for w in ('да', 'ещё', 'еще', 'снова', 'заново', 'хочу', 'играть')):
