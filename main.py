@@ -104,13 +104,12 @@ def webhook():
                     image_id=IMAGES['marvel']
                 ))
 
-        # Маршрутизация по состоянию сессии
+
         if is_new_session or user
 [С
 _list)}'
         ))
 
-    # Следующий вопрос
     next_question = GameLogic.get_current_question(user_session)
     return ask_question(user_session, next_question, preamble=feedback_text, preamble_tts=feedback_tts)
 
@@ -128,4 +127,65 @@ def handle_replay(user_session, user_input):
             tts='Спасибо за игру! Возвращайся!',
             end_session=True
         ))
+
+def handle_replay(user_session, user_input):
+    """Обработка запроса на повторную игру."""
+    if any(w in user_input for w in ('да', 'ещё', 'еще', 'снова', 'заново', 'хочу', 'играть')):
+        user_session.reset()
+        db.session.commit()
+        return handle_welcome(user_session)
+    else:
+        user_session.reset()
+        db.session.commit()
+        return jsonify(make_response(
+            'Спасибо за игру! Возвращайся, когда захочешь ещё раз проверить знания! 🦸‍♂️',
+            tts='Спасибо за игру! Возвращайся!',
+            end_session=True
+        ))
+
+def ask_question(user_session, question, first=False, preamble='', preamble_tts=''):
+    questions_list = json.loads(user_session.questions_json)
+    q_num = user_session.current_question_index + 1
+    total = len(questions_list)
+
+    prefix = f'Вопрос {q_num} из {total}. '
+    q_text = prefix + question.text
+
+    if preamble:
+        full_text = preamble + '\n\n' + q_text
+        full_tts = preamble_tts + ' ' + q_text
+    else:
+        full_text = q_text
+        full_tts = (SOUNDS['intro'] if first else '') + q_text
+
+    emoji = '🌍' if question.question_type == 'city' else '🦸'
+    full_text = emoji + ' ' + full_text
+
+    return jsonify(make_response(
+        full_text,
+        tts=full_tts,
+        buttons=['Подсказка', 'Пропустить'],
+        image_id=IMAGES['marvel']
+    ))
+
+def finalize_text(user_session, preamble=''):
+    questions_list = json.loads(user_session.questions_json)
+    total = len(questions_list)
+    score = user_session.score
+
+    if score == total:
+        verdict = 'Великолепно! Ты настоящий знаток Marvel! 🏆'
+    elif score >= total * 0.7:
+        verdict = 'Отлично! Ты хорошо знаешь вселенную Marvel! 👏'
+    elif score >= total * 0.4:
+        verdict = 'Неплохо! Есть куда расти, герой! 💪'
+    else:
+        verdict = 'Стоит пересмотреть фильмы Marvel! 🎬'
+
+    result = f'Игра окончена!\nТвой результат: {score} из {total} правильных ответов.\n{verdict}'
+    user_session.state = 'asking_replay'
+    db.session.commit()
+
+    return (preamble + '\n\n' if preamble else '') + result + '\n\nХочешь сыграть ещё раз?'
+
     
