@@ -188,4 +188,52 @@ def finalize_text(user_session, preamble=''):
 
     return (preamble + '\n\n' if preamble else '') + result + '\n\nХочешь сыграть ещё раз?'
 
+def finalize_game(user_session):
+    result_text = finalize_text(user_session)
+    return jsonify(make_response(
+        result_text,
+        buttons=['Да, ещё раз!', 'Нет, спасибо'],
+        image_id=IMAGES['result']
+    ))
+
+@app.route('/health', methods=['GET'])
+def health():
+    return jsonify({'status': 'ok', 'service': 'Marvel Quiz Alice Skill'})
+
+if name == 'main':
+    with app.app_context():
+        init_db()
+        # Загружаем вопросы из JSON, если БД пуста
+        if Question.query.count() == 0:
+            load_questions_from_json('questions.json')
+            logger.info('Вопросы загружены из questions.json')
+        else:
+            logger.info(f'В БД уже {Question.query.count()} вопросов')
+
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)_session.state == 'idle':
+            return handle_welcome(user_session)
+
+        elif user_session.state == 'choosing_mode':
+            return handle_mode_choice(user_session, user_input)
+
+        elif user_session.state == 'playing':
+            return handle_answer(user_session, user_input)
+
+        elif user_session.state == 'asking_replay':
+            return handle_replay(user_session, user_input)
+
+        else:
+            user_session.state = 'idle'
+            db.session.commit()
+            return handle_welcome(user_session)
+
+    except Exception as e:
+        logger.error(f"Ошибка обработки запроса: {e}", exc_info=True)
+        return jsonify(make_response(
+            'Произошла ошибка. Попробуй ещё раз!',
+            buttons=['Начать заново']
+        ))
+
+
     
