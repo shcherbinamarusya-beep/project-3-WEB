@@ -203,7 +203,6 @@ def health():
 if name == 'main':
     with app.app_context():
         init_db()
-        # Загружаем вопросы из JSON, если БД пуста
         if Question.query.count() == 0:
             load_questions_from_json('questions.json')
             logger.info('Вопросы загружены из questions.json')
@@ -235,5 +234,45 @@ if name == 'main':
             buttons=['Начать заново']
         ))
 
+def handle_welcome(user_session):
+    tts_intro = SOUNDS['intro']
+    text = (
+        'Добро пожаловать в викторину по вселенной Marvel! '
+        'Тебя ждут вопросы о героях, злодеях и городах киновселенной. '
+        'За каждый правильный ответ — 1 очко. '
+        'Выбери режим игры: 5 или 10 вопросов?'
+    )
+    tts = tts_intro + text
+
+    user_session.state = 'choosing_mode'
+    db.session.commit()
+
+    return jsonify(make_response(
+        text, tts=tts,
+        buttons=['5 вопросов', '10 вопросов'],
+        image_id=IMAGES['welcome'],
+        image_title='Marvel Quiz',
+        image_desc='Проверь свои знания о вселенной Marvel!'
+    ))
+
+def handle_mode_choice(user_session, user_input):
+    if '10' in user_input or 'десять' in user_input:
+        mode = 10
+    elif '5' in user_input or 'пять' in user_input:
+        mode = 5
+    else:
+        return jsonify(make_response(
+            'Не понял выбор. Скажи "5 вопросов" или "10 вопросов".',
+            buttons=['5 вопросов', '10 вопросов']
+        ))
+
+    GameLogic.start_game(user_session, mode)
+    db.session.commit()
+
+    question = GameLogic.get_current_question(user_session)
+    if not question:
+        return jsonify(make_response('Не удалось загрузить вопросы. Попробуй позже!'))
+
+    return ask_question(user_session, question, first=True)
 
     
