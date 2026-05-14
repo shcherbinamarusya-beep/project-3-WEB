@@ -1,128 +1,212 @@
 [
   {
     "text": "Как зовут бога грома в киновселенной Marvel?",
+    "answers_json": "[\"тор\", \"тор оденсон\", \"god of thunder\", \"тор-громовержец\"]",
     "correct_answer": "Тор",
-    "type": "marvel"
+    "question_type": "marvel",
+    "latitude": null,
+    "longitude": null,
+    "city_name": null,
+    "hint": null
   },
   {
     "text": "В каком городе находится штаб-квартира Мстителей?",
+    "answers_json": "[\"нью-йорк\", \"nyc\", \"new york\", \"нью йорк\", \"нью-йорк сити\"]",
     "correct_answer": "Нью-Йорк",
-    "type": "city",
+    "question_type": "city",
     "latitude": 40.7128,
-    "longitude": -74.0060,
-    "city_name": "Нью-Йорк"
+    "longitude": -74.006,
+    "city_name": "Нью-Йорк",
+    "hint": null
   },
   {
     "text": "Кто создал Железного человека?",
+    "answers_json": "[\"тони старк\", \"tony stark\", \"тонни старк\", \"тони старк\", \"железный человек\"]",
     "correct_answer": "Тони Старк",
-    "type": "marvel"
+    "question_type": "marvel",
+    "latitude": null,
+    "longitude": null,
+    "city_name": null,
+    "hint": null
   },
   {
     "text": "Какой персонаж Marvel известен тем, что сломал четвертую стену?",
+    "answers_json": "[\"дэдпул\", \"deadpool\", \"дэдпул\", \"уэйд уилсон\", \"болтун\"]",
     "correct_answer": "Дэдпул",
-    "type": "marvel"
+    "question_type": "marvel",
+    "latitude": null,
+    "longitude": null,
+    "city_name": null,
+    "hint": null
   },
   {
     "text": "Как зовут суперзлодея в «Человеке-муравье»?",
+    "answers_json": "[\"желтый шершень\", \"жёлтый шершень\", \"yellow jacket\", \"жёлтый шершень\", \"даррен кросс\"]",
     "correct_answer": "Желтый шершень",
-    "type": "marvel"
+    "question_type": "marvel",
+    "latitude": null,
+    "longitude": null,
+    "city_name": null,
+    "hint": null
   },
   {
     "text": "В каком образе появится Стэн Ли в «Стражах Галактики. Часть 2»?",
+    "answers_json": "[\"астронавта\", \"астронавт\", \"космонавт\", \"пилот\"]",
     "correct_answer": "Астронавта",
-    "type": "marvel"
+    "question_type": "marvel",
+    "latitude": null,
+    "longitude": null,
+    "city_name": null,
+    "hint": null
   },
   {
     "text": "Кто отрубил Таносу голову?",
+    "answers_json": "[\"тор\", \"тор оденсон\", \"тотор\", \"громовержец\"]",
     "correct_answer": "Тор",
-    "type": "marvel"
+    "question_type": "marvel",
+    "latitude": null,
+    "longitude": null,
+    "city_name": null,
+    "hint": null
   },
   {
     "text": "Какой камень Танос нашёл первым?",
+    "answers_json": "[\"камень силы\", \"камень сили\", \"power stone\", \"камень мощи\", \"силовой камень\"]",
     "correct_answer": "Камень Силы",
-    "type": "marvel"
-  }, 
+    "question_type": "marvel",
+    "latitude": null,
+    "longitude": null,
+    "city_name": null,
+    "hint": null
+  },
   {
     "text": "Какой подарок Танос дал маленькой Гаморе перед тем, как расстрелять её семью?",
+    "answers_json": "[\"нож\", \"кинжал\", \"складной нож\", \"ножик\"]",
     "correct_answer": "Нож",
-    "type": "marvel"
+    "question_type": "marvel",
+    "latitude": null,
+    "longitude": null,
+    "city_name": null,
+    "hint": null
   },
   {
     "text": "На какой планете был Халк после событий фильма 'Эра Альтрона'?",
+    "answers_json": "[\"сакаар\", \"sakaar\", \"сакаар\", \"сакар\", \"планета сакаар\"]",
     "correct_answer": "На планете Сакаар",
-    "type": "marvel"
+    "question_type": "marvel",
+    "latitude": null,
+    "longitude": null,
+    "city_name": null,
+    "hint": null
   },
   {
     "text": "Кто выиграл в битве между Тором и Халком?",
+    "answers_json": "[\"никто\", \"ничья\", \"draw\", \"победителя нет\"]",
     "correct_answer": "Никто",
-    "type": "marvel"
+    "question_type": "marvel",
+    "latitude": null,
+    "longitude": null,
+    "city_name": null,
+    "hint": null
   },
   {
     "text": "В какое существо Локи превратился в детстве чтобы напугать своего брата?",
+    "answers_json": "[\"змея\", \"в змею\", \"змеюка\", \"гадюка\"]",
     "correct_answer": "В змею",
-    "type": "marvel"
+    "question_type": "marvel",
+    "latitude": null,
+    "longitude": null,
+    "city_name": null,
+    "hint": null
   },
   {
     "text": "Сколько, по словам Одина, существует миров?",
+    "answers_json": "[\"девять\", \"9\", \"9 миров\", \"девять миров\"]",
     "correct_answer": "Девять",
-    "type": "marvel"
+    "question_type": "marvel",
+    "latitude": null,
+    "longitude": null,
+    "city_name": null,
+    "hint": null
   },
   {
     "text": "Любимая группа Тони Старка?",
+    "answers_json": "[\"ac/dc\", \"ac dc\", \"ac/dc\", \"ак-ди-си\"]",
     "correct_answer": "AC/DC",
-    "type": "marvel"
-  }, 
+    "question_type": "marvel",
+    "latitude": null,
+    "longitude": null,
+    "city_name": null,
+    "hint": null
+  },
   {
     "text": "Как в камео в фильме 'Мстители' Стен Ли назвал Тони Старка?",
+    "answers_json": "[\"тони карк\", \"tony cark\", \"тони каркс\", \"тоник арк\"]",
     "correct_answer": "Тони Карк",
-    "type": "marvel"
+    "question_type": "marvel",
+    "latitude": null,
+    "longitude": null,
+    "city_name": null,
+    "hint": null
   },
   {
     "text": "Какой город отправился громить Халк, находясь под манипуляциями Алой ведьмы?",
+    "answers_json": "[\"йоханнесбург\", \"johannesburg\", \"йоханнесбург\", \"йобург\", \"joburg\"]",
     "correct_answer": "В Йоханнесбург",
-    "type": "city",
-    "latitude": −26.20227,
+    "question_type": "city",
+    "latitude": -26.20227,
     "longitude": 28.0463,
-    "city_name": "Йоханнесбург"
+    "city_name": "Йоханнесбург",
+    "hint": null
   },
   {
     "text": "В какой стране Земли находился новый, возрождённый Асгард согласно фильму «Мстители: Финал»?",
+    "answers_json": "[\"норвегия\", \"norway\", \"норвегии\", \"новый асгард\"]",
     "correct_answer": "В Норвегии",
-    "type": "city",
+    "question_type": "city",
     "latitude": 59.9127,
     "longitude": 10.7461,
-    "city_name": "Норвегия"
+    "city_name": "Норвегия",
+    "hint": null
   },
   {
     "text": "В каком городе штата Калифорнии Тони Старк сидела на гигантском пончике?",
+    "answers_json": "[\"инглвуд\", \"inglewood\", \"инглвуд\", \"инглвуд калифорния\"]",
     "correct_answer": "В Инглвуде",
-    "type": "city",
+    "question_type": "city",
     "latitude": 33.9617,
-    "longitude": 118.353,
-    "city_name": "Инглвуд"
-  }, 
+    "longitude": -118.353,
+    "city_name": "Инглвуд",
+    "hint": null
+  },
   {
     "text": "Из какого города родом Чёрная Вдова?",
+    "answers_json": "[\"волгоград\", \"volgograd\", \"сталинград\", \"волгоград\", \"царцын\"]",
     "correct_answer": "Волгоград",
-    "type": "city",
-    "latitude": 33.9617,
-    "longitude": 44,5018,
-    "city_name": " Волгограде"
-  },  
+    "question_type": "city",
+    "latitude": 48.708,
+    "longitude": 44.5018,
+    "city_name": "Волгоград",
+    "hint": null
+  },
   {
     "text": "В какой стране реально снимали битву в Заковии?",
+    "answers_json": "[\"италия\", \"italy\", \"итали\", \"республика италия\"]",
     "correct_answer": "в Италии",
-    "type": "city",
-    "latitude": 7.74472,
-    "longitude": 45.60833,
-    "city_name": "в Италии"
+    "question_type": "city",
+    "latitude": 41.9028,
+    "longitude": 12.4964,
+    "city_name": "Италия",
+    "hint": null
   },
   {
     "text": "Откуда родом Тони Старк(район Нью-Йорка)?",
+    "answers_json": "[\"манхэттен\", \"manhattan\", \"манхэттен\", \"манхеттен\", \"манхаттан\"]",
     "correct_answer": "Манхэттен",
-    "type": "city",
-    "latitude": -73,9663,
-    "longitude": 40,7834,
-    "city_name": "Манхэттен"
-  },
+    "question_type": "city",
+    "latitude": 40.7834,
+    "longitude": -73.9663,
+    "city_name": "Манхэттен",
+    "hint": null
+  }
 ]
