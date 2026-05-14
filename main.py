@@ -293,7 +293,6 @@ def handle_answer(user_session, user_input):
         feedback_tts = SOUNDS['wrong'] + feedback_text
         img_id = IMAGES['wrong']
 
-    # Показываем карту для вопросов о городах
     extra_card = None
     map_info = ''
     if question.question_type == 'city' and question.latitude and question.longitude:
@@ -303,11 +302,9 @@ def handle_answer(user_session, user_input):
             # Для карты используем текстовое описание (Static API — внешняя ссылка)
             feedback_text += f'\n\nГород {question.city_name}: {map_url}'
 
-    # Переходим к следующему вопросу
     user_session.current_question_index += 1
     db.session.commit()
 
-    # Проверяем, есть ли ещё вопросы
     questions_list = json.loads(user_session.questions_json)
     if user_session.current_question_index >= len(questions_list):
         # Игра завершена — показываем фидбек и результат
