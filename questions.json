@@ -106,7 +106,7 @@
     "correct_answer": "Волгоград",
     "type": "city",
     "latitude": 33.9617,
-    "longitude": 44,5018,
+    "longitude": 44.5018,
     "city_name": " Волгограде"
   },  
   {
@@ -121,8 +121,8 @@
     "text": "Откуда родом Тони Старк(район Нью-Йорка)?",
     "correct_answer": "Манхэттен",
     "type": "city",
-    "latitude": -73,9663,
-    "longitude": 40,7834,
+    "latitude": -73.9663,
+    "longitude": 40.7834,
     "city_name": "Манхэттен"
   },
   
