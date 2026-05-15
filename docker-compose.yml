@@ -1,0 +1,17 @@
+services:
+  app:
+    build: .
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+    networks:
+      - dokploy-network
+    volumes:
+      - db_data:/app/instance
+    restart: unless-stopped
+
+volumes:
+  db_data:
+
+networks:
+  dokploy-network:
+    external: true
