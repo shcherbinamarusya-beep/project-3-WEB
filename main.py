@@ -22,14 +22,6 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'marvel-secret-key-2024'
 
 db.init_app(app)
 
-IMAGES = {
-    'welcome':    '965417/7aff91b41cff6aba01d2', 
-    'correct':    '965417/7aff91b41cff6aba01d3',
-    'wrong':      '965417/7aff91b41cff6aba01d4',
-    'result':     '965417/7aff91b41cff6aba01d5',
-    'marvel':     '965417/7aff91b41cff6aba01d6',
-}
-
 SOUNDS = {
     'correct': '<speaker audio="alice-sounds-animals-cat-1.opus">',  # Встроенные звуки Alice
     'wrong':   '<speaker audio="alice-sounds-animals-cat-2.opus">',
