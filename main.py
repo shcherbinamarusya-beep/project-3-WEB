@@ -338,7 +338,6 @@ def handle_welcome(user_session):
     return jsonify(make_response(
         text, tts=tts,
         buttons=['5 вопросов', '10 вопросов'],
-        image_id=IMAGES['welcome'],
         image_title='Marvel Quiz',
         image_desc='Проверь свои знания о вселенной Marvel!'
     ))
