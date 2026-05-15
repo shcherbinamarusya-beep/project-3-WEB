@@ -298,7 +298,7 @@ if name == 'main':
             logger.info(f'В БД уже {Question.query.count()} вопросов')
             return handle_welcome(user_session)
 
-        elif user_session.state == 'choosing_mode':
+        if user_session.state == 'choosing_mode':
             return handle_mode_choice(user_session, user_input)
 
         elif user_session.state == 'playing':
