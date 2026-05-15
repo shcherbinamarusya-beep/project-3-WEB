@@ -296,9 +296,6 @@ if name == 'main':
             logger.info('Вопросы загружены из questions.json')
         else:
             logger.info(f'В БД уже {Question.query.count()} вопросов')
-
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)_session.state == 'idle':
             return handle_welcome(user_session)
 
         elif user_session.state == 'choosing_mode':
