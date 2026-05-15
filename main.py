@@ -401,7 +401,6 @@ def handle_answer(user_session, user_input):
         map_url = get_static_map_url(question.latitude, question.longitude, question.city_name)
         if map_url:
             map_info = f'\n🗺️ {question.city_name} на карте!'
-            # Для карты используем текстовое описание (Static API — внешняя ссылка)
             feedback_text += f'\n\nГород {question.city_name}: {map_url}'
 
     user_session.current_question_index += 1
@@ -409,7 +408,6 @@ def handle_answer(user_session, user_input):
 
     questions_list = json.loads(user_session.questions_json)
     if user_session.current_question_index >= len(questions_list):
-        # Игра завершена — показываем фидбек и результат
         result_text = finalize_text(user_session, feedback_text)
         return jsonify(make_response(
             result_text,
@@ -428,7 +426,6 @@ def health():
 if __name__ == '__main__':
     with app.app_context():
         init_db()
-        # Загружаем вопросы из JSON, если БД пуста
         if Question.query.count() == 0:
             load_questions_from_json('questions.json')
             logger.info('Вопросы загружены из questions.json')
