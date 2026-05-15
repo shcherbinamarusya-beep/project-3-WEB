@@ -85,7 +85,7 @@ def webhook():
                 user_session.reset()
                 db.session.commit()
                 return jsonify(make_response(
-                    'Спасибо за игру! До встречи, герой! 🦸',
+                    'Спасибо за игру! До встречи, герой!',
                     tts='Спасибо за игру! До встречи, герой!',
                     end_session=True
                 ))
