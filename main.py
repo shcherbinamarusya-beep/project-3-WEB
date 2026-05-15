@@ -312,12 +312,12 @@ if name == 'main':
             db.session.commit()
             return handle_welcome(user_session)
 
-    except Exception as e:
-        logger.error(f"Ошибка обработки запроса: {e}", exc_info=True)
-        return jsonify(make_response(
-            'Произошла ошибка. Попробуй ещё раз!',
-            buttons=['Начать заново']
-        ))
+   # except Exception as e:
+       # logger.error(f"Ошибка обработки запроса: {e}", exc_info=True)
+       # return jsonify(make_response(
+          #  'Произошла ошибка. Попробуй ещё раз!',
+          #  buttons=['Начать заново']
+      #  ))
 
 def handle_welcome(user_session):
     tts_intro = SOUNDS['intro']
