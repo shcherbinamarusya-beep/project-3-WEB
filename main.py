@@ -137,7 +137,6 @@ def handle_welcome(user_session):
  
  
 def handle_mode_choice(user_session, user_input):
-    """Обработка выбора режима (5 или 10 вопросов)."""
     if '10' in user_input or 'десять' in user_input:
         mode = 10
     elif '5' in user_input or 'пять' in user_input:
@@ -159,7 +158,6 @@ def handle_mode_choice(user_session, user_input):
  
  
 def handle_answer(user_session, user_input):
-    """Обработка ответа пользователя на вопрос."""
     question = GameLogic.get_current_question(user_session)
     if not question:
         return finalize_game(user_session)
@@ -220,7 +218,6 @@ def handle_replay(user_session, user_input):
         ))
 
 def handle_replay(user_session, user_input):
-    """Обработка запроса на повторную игру."""
     if any(w in user_input for w in ('да', 'ещё', 'еще', 'снова', 'заново', 'хочу', 'играть')):
         user_session.reset()
         db.session.commit()
@@ -229,7 +226,7 @@ def handle_replay(user_session, user_input):
         user_session.reset()
         db.session.commit()
         return jsonify(make_response(
-            'Спасибо за игру! Возвращайся, когда захочешь ещё раз проверить знания! 🦸‍♂️',
+            'Спасибо за игру! Возвращайся, когда захочешь ещё раз проверить знания!',
             tts='Спасибо за игру! Возвращайся!',
             end_session=True
         ))
@@ -366,7 +363,6 @@ def handle_mode_choice(user_session, user_input):
 
     return ask_question(user_session, question, first=True)
 def handle_answer(user_session, user_input):
-    """Обработка ответа пользователя на вопрос."""
     question = GameLogic.get_current_question(user_session)
     if not question:
         return finalize_game(user_session)
@@ -408,7 +404,6 @@ def handle_answer(user_session, user_input):
  
 @app.route('/health', methods=['GET'])
 def health():
-    """Проверка работоспособности сервера."""
     return jsonify({'status': 'ok', 'service': 'Marvel Quiz Alice Skill'})
  
  
