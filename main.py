@@ -64,12 +64,10 @@ def make_image_gallery(items):
     
 @app.route('/webhook', methods=['POST'])
 def webhook():
-    """Основной вебхук для обработки запросов от Яндекс.Алисы."""
     try:
         data = request.get_json()
         logger.info(f"Входящий запрос: {json.dumps(data, ensure_ascii=False)[:200]}")
 
-        # Достаём данные из запроса
         session_data = data.get('session', {})
         user_id = session_data.get('user_id') or session_data.get('application', {}).get('application_id', 'anon')
         is_new_session = session_data.get('new', False)
@@ -77,14 +75,11 @@ def webhook():
         user_input = request_body.get('original_utterance', '').strip().lower()
         is_ping = request_body.get('type') == 'SimpleUtterance' and user_input == ''
 
-        # Обрабатываем пинг (проверка доступности навыка)
         if is_ping:
             return jsonify(make_response('Навык работает!', end_session=True))
 
-        # Получаем или создаём сессию пользователя
         user_session = Session.get_or_create(user_id)
 
-        # Обрабатываем команды завершения
         if user_input in ('стоп', 'выход', 'закрыть', 'хватит', 'нет', 'не хочу'):
             if user_session.state == 'asking_replay':
                 user_session.reset()
@@ -92,8 +87,7 @@ def webhook():
                 return jsonify(make_response(
                     'Спасибо за игру! До встречи, герой! 🦸',
                     tts='Спасибо за игру! До встречи, герой!',
-                    end_session=True,
-                    image_id=IMAGES['marvel']
+                    end_session=True
                 ))
 
         if is_new_session or user_session.state == 'idle':
@@ -122,7 +116,6 @@ def webhook():
  
  
 def handle_welcome(user_session):
-    """Приветствие и выбор режима игры."""
     tts_intro = SOUNDS['intro']
     text = (
         'Добро пожаловать в викторину по вселенной Marvel! '
@@ -138,7 +131,6 @@ def handle_welcome(user_session):
     return jsonify(make_response(
         text, tts=tts,
         buttons=['5 вопросов', '10 вопросов'],
-        image_id=IMAGES['welcome'],
         image_title='Marvel Quiz',
         image_desc='Проверь свои знания о вселенной Marvel!'
     ))
@@ -178,12 +170,10 @@ def handle_answer(user_session, user_input):
         user_session.score += 1
         feedback_text = GameLogic.get_correct_feedback()
         feedback_tts = SOUNDS['correct'] + feedback_text
-        img_id = IMAGES['correct']
     else:
         correct_ans = question.correct_answer
         feedback_text = GameLogic.get_wrong_feedback(correct_ans)
         feedback_tts = SOUNDS['wrong'] + feedback_text
-        img_id = IMAGES['wrong']
  
     
     extra_card = None
@@ -206,7 +196,6 @@ def handle_answer(user_session, user_input):
             result_text,
             tts=feedback_tts + ' ' + result_text,
             buttons=['Сыграть ещё раз', 'Выйти'],
-            image_id=IMAGES['result'],
             image_title=f'Результат: {user_session.score} из {len(questions_list)}'
         ))
  
