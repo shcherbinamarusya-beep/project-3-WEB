@@ -23,7 +23,7 @@ if not app.config['SECRET_KEY']:
 
 
 IMAGES = {
-    'marvel': '1530459/c524e0b3e9e8c6d5e1f2',
+    'marvel': 'https://litter.catbox.moe/4tqgs8.jpeg',
     'correct': '1530459/5a9b2f0c1d7e8a9b0c3d',
     'wrong': '1530459/4f3e2d1c0b9a8f7e6d5c',
     'result': '1530459/7a8b9c0d1e2f3a4b5c6d'
