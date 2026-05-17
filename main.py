@@ -56,7 +56,16 @@ def make_response(text, tts=None, end_session=False, buttons=None,
         }
     return {'response': response, 'version': '1.0'}
 
+@app.route('/', methods=['GET'])
+def index():
+    return jsonify({
+        'status': 'ok',
+        'service': 'Marvel Quiz Alice Skill',
+        'webhook': '/webhook',
+    })
 
+
+@app.route('/', methods=['POST'])
 @app.route('/webhook', methods=['POST'])
 def webhook():
     try:
