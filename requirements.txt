@@ -1,5 +1,6 @@
 Flask
 SQLAlchemy
+python-dotenv
 requests
 flask-sqlalchemy
 psycopg2-binary
