@@ -267,7 +267,7 @@ def health():
 
 if __name__ == '__main__':
     with app.app_context():
-        init_db()
+        init_db(app)
         if Question.query.count() == 0:
             load_questions_from_json('questions.json')
             logger.info('Вопросы загружены из questions.json')
