@@ -16,7 +16,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///marvel_quiz.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 if not app.config['SECRET_KEY']:
-    raise RuntimeError('SECRET_KEY environment variable is not set!')
+    logger.warning('SECRET_KEY is not set; using a development fallback.')
+    app.config['SECRET_KEY'] = 'dev-secret-key'
 
 
 IMAGES = {
@@ -67,7 +68,11 @@ def webhook():
 
         request_body = data.get('request', {})
         user_input = request_body.get('original_utterance', '').strip().lower()
-        is_ping = request_body.get('type') == 'SimpleUtterance' and user_input == ''
+        is_ping = (
+            request_body.get('type') == 'SimpleUtterance'
+            and user_input == ''
+            and not is_new_session
+        )
 
         if is_ping:
             return jsonify(make_response('Навык работает!', end_session=True))
@@ -151,20 +156,42 @@ def handle_answer(user_session, user_input):
     if not question:
         return finalize_game(user_session)
 
+    if user_input in ('подсказка', 'дай подсказку', 'хочу подсказку'):
+        return handle_hint(question)
+
+    if user_input in ('пропустить', 'следующий', 'дальше', 'не знаю'):
+        feedback_text = f'Пропускаем. Правильный ответ: {question.correct_answer}.'
+        feedback_tts = feedback_text
+        return advance_after_answer(user_session, question, feedback_text, feedback_tts)
+
     is_correct = GameLogic.check_answer(question, user_input)
 
     if is_correct:
         user_session.score += 1
         feedback_text = GameLogic.get_correct_feedback()
         feedback_tts = SOUNDS['correct'] + feedback_text
-        img_id = IMAGES['correct']
     else:
         correct_ans = question.correct_answer
         feedback_text = GameLogic.get_wrong_feedback(correct_ans)
         feedback_tts = SOUNDS['wrong'] + feedback_text
-        img_id = IMAGES['wrong']
+
+    return advance_after_answer(user_session, question, feedback_text, feedback_tts)
 
 
+def handle_hint(question):
+    if question.hint:
+        text = f'Подсказка: {question.hint}\n\n{question.text}'
+    else:
+        text = f'Для этого вопроса подсказки нет.\n\n{question.text}'
+
+    return jsonify(make_response(
+        text,
+        buttons=['Пропустить'],
+        image_id=IMAGES['marvel']
+    ))
+
+
+def advance_after_answer(user_session, question, feedback_text, feedback_tts):
     if question.question_type == 'city' and question.latitude and question.longitude:
         map_url = get_static_map_url(question.latitude, question.longitude, question.city_name)
         if map_url:
@@ -234,6 +261,11 @@ def finalize_text(user_session, preamble=''):
     questions_list = json.loads(user_session.questions_json)
     total = len(questions_list)
     score = user_session.score
+
+    if total == 0:
+        user_session.reset()
+        db.session.commit()
+        return 'Вопросы пока не загружены. Попробуй начать игру позже.'
 
     if score == total:
         verdict = 'Великолепно! Ты настоящий знаток Marvel! 🏆'
