@@ -28,7 +28,7 @@ def load_questions_from_json(filepath: str):
             skipped += 1
             continue
 
-                    question = Question.query.filter_by(text=item['text']).first()
+        question = Question.query.filter_by(text=item['text']).first()
         if not question and item['text'] in LEGACY_QUESTION_TEXTS:
             question = Question.query.filter_by(text=LEGACY_QUESTION_TEXTS[item['text']]).first()
         if question:
