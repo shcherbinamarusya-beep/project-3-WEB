@@ -26,4 +26,5 @@ def get_static_map_url(
         logger.info(f'Карта для «{city_name}»: {url}')
         return url
     except Exception as e:
-        logger.error(f'Ош
+        logger.error(f'Ошибка при формировании URL карты: {e}')
+        return None
