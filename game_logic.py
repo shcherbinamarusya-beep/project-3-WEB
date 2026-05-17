@@ -51,7 +51,7 @@ class GameLogic:
     @classmethod
     def check_answer(cls, question: Question, user_input: str) -> bool:
         possible = json.loads(question.answers_json)
-                user_norm = cls.normalize_answer(user_input)
+        user_norm = cls.normalize_answer(user_input)
         return any(cls.answers_match(user_norm, cls.normalize_answer(ans)) for ans in possible)
 
     @staticmethod
