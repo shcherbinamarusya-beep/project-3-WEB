@@ -5,7 +5,9 @@ from models import Question
 
 logger = logging.getLogger(__name__)
 
-
+LEGACY_QUESTION_TEXTS = {
+    'Кто под костюмом Железного человека в киновселенной Marvel?': 'Кто создал Железного человека?',
+}
 def load_questions_from_json(filepath: str):
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
@@ -26,8 +28,18 @@ def load_questions_from_json(filepath: str):
             skipped += 1
             continue
 
-        exists = Question.query.filter_by(text=item['text']).first()
-        if exists:
+                    question = Question.query.filter_by(text=item['text']).first()
+        if not question and item['text'] in LEGACY_QUESTION_TEXTS:
+            question = Question.query.filter_by(text=LEGACY_QUESTION_TEXTS[item['text']]).first()
+        if question:
+            question.text = item['text']
+            question.answers_json = item['answers_json']
+            question.correct_answer = item['correct_answer']
+            question.question_type = item.get('question_type', 'marvel')
+            question.latitude = item.get('latitude')
+            question.longitude = item.get('longitude')
+            question.city_name = item.get('city_name')
+            question.hint = item.get('hint')
             skipped += 1
             continue
 
