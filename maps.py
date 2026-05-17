@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -11,7 +12,7 @@ def get_static_map_url(
     city_name: str = '',
     zoom: int = 10,
     size: str = '450,450',
-) -> str | None:
+) -> Optional[str]:
 
     try:
         pt = f'{longitude},{latitude},pm2rdm'
