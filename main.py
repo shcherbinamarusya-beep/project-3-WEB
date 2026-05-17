@@ -5,9 +5,9 @@ from flask import Flask, request, jsonify
 from database import db, init_db
 from models import Question, Session
 from game_logic import GameLogic
-from maps import get_static_map_url
+from maps import get_static_map_url, get_yandex_maps_url
 from content import load_questions_from_json
-
+from dialogs_images import upload_image_by_url
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -210,10 +210,35 @@ def handle_hint(question):
 
 
 def advance_after_answer(user_session, question, feedback_text, feedback_tts):
+    buttons = []
+    map_image_id = None
+    map_image_title = None
     if question.question_type == 'city' and question.latitude and question.longitude:
-        map_url = get_static_map_url(question.latitude, question.longitude, question.city_name)
+                static_map_url = get_static_map_url(
+            question.latitude,
+            question.longitude,
+            question.city_name,
+        )
+        if static_map_url:
+            map_image_id = upload_image_by_url(static_map_url)
+            if map_image_id:
+                map_image_title = f'Место на карте: {question.city_name}'
+
+        map_url = get_yandex_maps_url(question.latitude, question.longitude, question.city_name)
+ 
         if map_url:
-            feedback_text += f'\n\nГород {question.city_name} на карте: {map_url}'
+            if map_image_id:
+                feedback_text += f'\n\nПоказываю место на карте: {question.city_name}.'
+                feedback_tts += f' Показываю место на карте: {question.city_name}.'
+            else:
+                feedback_text += f'\n\nМесто на карте: {question.city_name}.'
+                feedback_tts += f' Место на карте: {question.city_name}.'
+            logger.info('Место на карте для города %s: %s', question.city_name, map_url)
+                        buttons.append({
+                'title': 'Показать место на карте',
+                'url': map_url,
+                'hide': False,
+            })
 
     user_session.current_question_index += 1
     db.session.commit()
@@ -226,8 +251,9 @@ def advance_after_answer(user_session, question, feedback_text, feedback_tts):
             result_text,
             tts=feedback_tts + ' ' + result_text,
             buttons=['Сыграть ещё раз', 'Выйти'],
-            image_id=IMAGES['result'],
-            image_title=f'Результат: {user_session.score} из {len(questions_list)}'
+            image_id=map_image_id or IMAGES['result'],
+            image_title=map_image_title or f'Результат: {user_session.score} из {len(questions_list)}',
+            image_desc=result_text
         ))
 
     next_question = GameLogic.get_current_question(user_session)
