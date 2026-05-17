@@ -21,6 +21,12 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'marvel-secret-key-2024'
 
 
 db.init_app(app)
+IMAGES = {
+    'marvel': '1530459/c524e0b3e9e8c6d5e1f2',  # пример ID из Яндекс.Диалогов
+    'correct': '1530459/5a9b2f0c1d7e8a9b0c3d',
+    'wrong': '1530459/4f3e2d1c0b9a8f7e6d5c',
+    'result': '1530459/7a8b9c0d1e2f3a4b5c6d'
+}
 
 SOUNDS = {
     'correct': '<speaker audio="alice-sounds-animals-cat-1.opus">',  # Встроенные звуки Alice
@@ -402,17 +408,4 @@ def handle_answer(user_session, user_input):
 def health():
     return jsonify({'status': 'ok', 'service': 'Marvel Quiz Alice Skill'})
  
- 
-if __name__ == '__main__':
-    with app.app_context():
-        init_db()
-        if Question.query.count() == 0:
-            load_questions_from_json('questions.json')
-            logger.info('Вопросы загружены из questions.json')
-        else:
-            logger.info(f'В БД уже {Question.query.count()} вопросов')
- 
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
- 
-    
+
