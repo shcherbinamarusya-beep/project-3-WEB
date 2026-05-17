@@ -51,8 +51,8 @@ def make_response(text, tts=None, end_session=False, buttons=None,
         response['card'] = {
             'type': 'BigImage',
             'image_id': image_id,
-            'title': image_title or text[:50],
-            'description': image_desc or '',
+            'title': image_title or 'Marvel Quiz',
+            'description': image_desc if image_desc is not None else text,
         }
     return {'response': response, 'version': '1.0'}
 
@@ -174,9 +174,16 @@ def handle_answer(user_session, user_input):
         feedback_text = f'Пропускаем. Правильный ответ: {question.correct_answer}.'
         feedback_tts = feedback_text
         return advance_after_answer(user_session, question, feedback_text, feedback_tts)
-
+    user_answer = GameLogic.normalize_answer(user_input)
+    if len(user_answer) == 1 and not user_answer.isdigit():
+        return ask_question(
+            user_session,
+            question,
+            preamble='Я не расслышала ответ. Попробуй сказать ещё раз.',
+            preamble_tts='Я не расслышала ответ. Попробуй сказать ещё раз.'
+        )
     is_correct = GameLogic.check_answer(question, user_input)
-
+    
     if is_correct:
         user_session.score += 1
         feedback_text = GameLogic.get_correct_feedback()
@@ -264,7 +271,9 @@ def ask_question(user_session, question, first=False, preamble='', preamble_tts=
         full_text,
         tts=full_tts,
         buttons=['Подсказка', 'Пропустить'],
-        image_id=IMAGES['marvel']
+        image_id=IMAGES['marvel'],
+        image_title=f'Вопрос {q_num} из {total}',
+        image_desc=full_text
     ))
 
 
@@ -310,9 +319,6 @@ def health():
 if __name__ == '__main__':
     with app.app_context():
         init_db(app)
-        if Question.query.count() == 0:
-            load_questions_from_json('questions.json')
-            logger.info('Вопросы загружены из questions.json')
-        else:
-            logger.info(f'В БД уже {Question.query.count()} вопросов')
+        load_questions_from_json('questions.json')
+        logger.info(f'В БД {Question.query.count()} вопросов')
     app.run(host='0.0.0.0', port=5000, debug=False)
