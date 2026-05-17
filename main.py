@@ -140,7 +140,11 @@ def handle_welcome(user_session):
         image_title='Marvel Quiz',
         image_desc='Проверь свои знания о вселенной Marvel!'
     ))
- 
+def check_answer(question, user_input):
+    import json
+    possible = json.loads(question.answers_json)
+    user_norm = user_input.strip().lower()
+    return any(user_norm == ans.lower() for ans in possible) 
  
 def handle_mode_choice(user_session, user_input):
     if '10' in user_input or 'десять' in user_input:
