@@ -18,7 +18,6 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 if not app.config['SECRET_KEY']:
     raise RuntimeError('SECRET_KEY environment variable is not set!')
 
-db.init_app(app)
 
 IMAGES = {
     'marvel': '1530459/c524e0b3e9e8c6d5e1f2',
