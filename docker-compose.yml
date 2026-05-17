@@ -4,6 +4,8 @@ services:
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - DATABASE_URL=sqlite:////app/instance/marvel_quiz.db
+      - YANDEX_SKILL_ID=${YANDEX_SKILL_ID}
+      - YANDEX_DIALOGS_OAUTH_TOKEN=${YANDEX_DIALOGS_OAUTH_TOKEN}
     networks:
       - dokploy-network
     volumes:
