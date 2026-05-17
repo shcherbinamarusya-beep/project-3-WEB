@@ -1,16 +1,17 @@
 import json
 import random
 from models import Question, Session
-
+import re
+from difflib import SequenceMatcher
 
 class GameLogic:
 
     CORRECT_PHRASES = [
-        'Правильно! Ты настоящий знаток Marvel! ✅',
-        'Верно! Щит Капитана Америки одобряет! ✅',
-        'Отлично! Тони Старк гордится тобой! ✅',
-        'Точно! Тор доволен! ✅',
-        'Правильно! Доктор Стрэндж уже это знал! ✅',
+        'Правильно! ✅',
+        'Верно! ✅',
+        'Отлично, это правильный ответ! ✅',
+        'Точно! ✅',
+        'Да, всё верно! ✅',
     ]
 
     WRONG_PHRASES = [
@@ -50,8 +51,29 @@ class GameLogic:
     @classmethod
     def check_answer(cls, question: Question, user_input: str) -> bool:
         possible = json.loads(question.answers_json)
-        user_norm = user_input.strip().lower()
-        return any(user_norm == ans.strip().lower() for ans in possible)
+                user_norm = cls.normalize_answer(user_input)
+        return any(cls.answers_match(user_norm, cls.normalize_answer(ans)) for ans in possible)
+
+    @staticmethod
+    def normalize_answer(text: str) -> str:
+        text = text.lower().replace('ё', 'е')
+        text = re.sub(r'[^a-zа-я0-9]+', ' ', text)
+        text = re.sub(r'\s+', ' ', text).strip()
+        return text
+
+    @classmethod
+    def answers_match(cls, user_answer: str, expected_answer: str) -> bool:
+        if not user_answer or not expected_answer:
+            return False
+        if user_answer == expected_answer:
+            return True
+        if len(expected_answer) >= 4 and expected_answer in user_answer:
+            return True
+        if len(user_answer) >= 4 and user_answer in expected_answer:
+            return True
+        if len(user_answer) >= 5 and len(expected_answer) >= 5:
+            return SequenceMatcher(None, user_answer, expected_answer).ratio() >= 0.82
+        return False
 
     @classmethod
     def get_correct_feedback(cls) -> str:
