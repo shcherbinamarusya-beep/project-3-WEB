@@ -83,7 +83,6 @@ def get_or_upload_image(image_id):
         return None
 
 def init_images():
-    """Предзагрузить статические картинки, если доступны ключи Яндекс.Диалогов."""
     for image_url in IMAGES.values():
         get_or_upload_image(image_url)
 
