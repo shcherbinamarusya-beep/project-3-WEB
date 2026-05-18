@@ -61,6 +61,15 @@ def make_response(text, tts=None, end_session=False, buttons=None,
         }
     return {'response': response, 'version': '1.0'}
 
+
+def get_or_upload_image(image_id):
+    """
+    Временная заглушка для get_or_upload_image.
+    Возвращает переданный ID изображения без загрузки.
+    В будущем нужно заменить на реальную логику загрузки в Яндекс.Диалоги.
+    """
+    return image_id
+
 @app.route('/', methods=['GET'])
 def index():
     return jsonify({
