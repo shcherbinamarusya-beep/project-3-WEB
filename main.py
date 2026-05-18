@@ -44,10 +44,18 @@ def make_response(text, tts=None, end_session=False, buttons=None,
         'end_session': end_session,
     }
     if buttons:
-        response['buttons'] = [
-            {'title': btn, 'hide': True} for btn in buttons
-        ]
-
+        response['buttons'] = []
+        for btn in buttons:
+            if isinstance(btn, dict):
+                button = {
+                    'title': btn['title'],
+                    'hide': btn.get('hide', True),
+                }
+                if btn.get('url'):
+                    button['url'] = btn['url']
+                response['buttons'].append(button)
+            else:
+                response['buttons'].append({'title': btn, 'hide': True})
     final_image_id = None
     if image_id:
         final_image_id = get_or_upload_image(image_id)
@@ -63,12 +71,27 @@ def make_response(text, tts=None, end_session=False, buttons=None,
 
 
 def get_or_upload_image(image_id):
-    """
-    Временная заглушка для get_or_upload_image.
-    Возвращает переданный ID изображения без загрузки.
-    В будущем нужно заменить на реальную логику загрузки в Яндекс.Диалоги.
-    """
-    return image_id
+    if isinstance(image_id, str) and image_id.startswith(('http://', 'https://')):
+        uploaded_image_id = upload_image_by_url(image_id)
+        if uploaded_image_id:
+            return uploaded_image_id
+        logger.warning('Image URL could not be uploaded and will be skipped: %s', image_id)
+        return None
+
+def init_images():
+    """Предзагрузить статические картинки, если доступны ключи Яндекс.Диалогов."""
+    for image_url in IMAGES.values():
+        get_or_upload_image(image_url)
+
+
+def bootstrap_app():
+    with app.app_context():
+        init_db(app)
+        load_questions_from_json('questions.json')
+        logger.info('В БД %s вопросов', Question.query.count())
+
+
+bootstrap_app()
 
 @app.route('/', methods=['GET'])
 def index():
@@ -228,7 +251,12 @@ def advance_after_answer(user_session, question, feedback_text, feedback_tts):
     map_image_id = None
     map_image_title = None
     static_map_url = None
-    if question.question_type == 'city' and question.latitude and question.longitude:
+    has_city_coordinates = (
+        question.question_type == 'city'
+        and question.latitude is not None
+        and question.longitude is not None
+    )
+    if has_city_coordinates:
         static_map_url = get_static_map_url(
             question.latitude,
             question.longitude,
@@ -239,7 +267,13 @@ def advance_after_answer(user_session, question, feedback_text, feedback_tts):
         if map_image_id:
             map_image_title = f'Место на карте: {question.city_name}'
 
-    map_url = get_yandex_maps_url(question.latitude, question.longitude, question.city_name)
+    map_url = None
+    if has_city_coordinates:
+        map_url = get_yandex_maps_url(
+            question.latitude,
+            question.longitude,
+            question.city_name,
+        )
  
     if map_url:
         if map_image_id:
@@ -265,14 +299,22 @@ def advance_after_answer(user_session, question, feedback_text, feedback_tts):
         return jsonify(make_response(
             result_text,
             tts=feedback_tts + ' ' + result_text,
-            buttons=['Сыграть ещё раз', 'Выйти'],
+            buttons=buttons + ['Сыграть ещё раз', 'Выйти'],
             image_id=map_image_id or IMAGES['result'],
             image_title=map_image_title or f'Результат: {user_session.score} из {len(questions_list)}',
             image_desc=result_text
         ))
 
     next_question = GameLogic.get_current_question(user_session)
-    return ask_question(user_session, next_question, preamble=feedback_text, preamble_tts=feedback_tts)
+    return ask_question(
+        user_session,
+        next_question,
+        preamble=feedback_text,
+        preamble_tts=feedback_tts,
+        extra_buttons=buttons,
+        image_id=map_image_id,
+        image_title=map_image_title,
+    )
 
 
 def handle_replay(user_session, user_input):
@@ -290,7 +332,17 @@ def handle_replay(user_session, user_input):
         ))
 
 
-def ask_question(user_session, question, first=False, preamble='', preamble_tts=''):
+
+def ask_question(
+    user_session,
+    question,
+    first=False,
+    preamble='',
+    preamble_tts='',
+    extra_buttons=None,
+    image_id=None,
+    image_title=None,
+):
     questions_list = json.loads(user_session.questions_json)
     q_num = user_session.current_question_index + 1
     total = len(questions_list)
@@ -311,9 +363,9 @@ def ask_question(user_session, question, first=False, preamble='', preamble_tts=
     return jsonify(make_response(
         full_text,
         tts=full_tts,
-        buttons=['Подсказка', 'Пропустить'],
-        image_id=IMAGES['marvel'],
-        image_title=f'Вопрос {q_num} из {total}',
+        buttons=(extra_buttons or []) + ['Подсказка', 'Пропустить'],
+        image_id=image_id or IMAGES['marvel'],
+        image_title=image_title or f'Вопрос {q_num} из {total}',
         image_desc=full_text
     ))
 
@@ -358,9 +410,5 @@ def health():
 
 
 if __name__ == '__main__':
-    with app.app_context():
-        init_db(app)
-        load_questions_from_json('questions.json')
-        init_images()
-        logger.info(f'В БД {Question.query.count()} вопросов')
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    init_images()
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=False)
