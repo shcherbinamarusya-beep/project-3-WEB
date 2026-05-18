@@ -218,8 +218,9 @@ def advance_after_answer(user_session, question, feedback_text, feedback_tts):
     buttons = []
     map_image_id = None
     map_image_title = None
+    static_map_url = None
     if question.question_type == 'city' and question.latitude and question.longitude:
-                static_map_url = get_static_map_url(
+        static_map_url = get_static_map_url(
             question.latitude,
             question.longitude,
             question.city_name,
