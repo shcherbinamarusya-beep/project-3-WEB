@@ -38,7 +38,7 @@ SOUNDS = {
 
 def make_response(text, tts=None, end_session=False, buttons=None,
                   image_id=None, image_title=None, image_desc=None,
-                  card_button=None):):
+                  card_button=None):
     response = {
         'text': text,
         'tts': tts or text,
