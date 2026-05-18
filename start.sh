@@ -2,7 +2,7 @@
 set -e
 
 cd "$(dirname "$0")"
-export PORT=5000
+export PORT="${PORT:-5000}"
 unset PIP_USER
 
 # Create venv if not exists
