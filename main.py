@@ -219,12 +219,12 @@ def advance_after_answer(user_session, question, feedback_text, feedback_tts):
             question.longitude,
             question.city_name,
         )
-        if static_map_url:
-            map_image_id = upload_image_by_url(static_map_url)
-            if map_image_id:
-                map_image_title = f'Место на карте: {question.city_name}'
+    if static_map_url:
+        map_image_id = upload_image_by_url(static_map_url)
+        if map_image_id:
+            map_image_title = f'Место на карте: {question.city_name}'
 
-        map_url = get_yandex_maps_url(question.latitude, question.longitude, question.city_name)
+    map_url = get_yandex_maps_url(question.latitude, question.longitude, question.city_name)
  
         if map_url:
             if map_image_id:
