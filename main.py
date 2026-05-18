@@ -361,5 +361,6 @@ if __name__ == '__main__':
     with app.app_context():
         init_db(app)
         load_questions_from_json('questions.json')
+        init_images()
         logger.info(f'В БД {Question.query.count()} вопросов')
     app.run(host='0.0.0.0', port=5000, debug=False)
