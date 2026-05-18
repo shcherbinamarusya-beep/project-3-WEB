@@ -6,6 +6,7 @@ services:
       - DATABASE_URL=sqlite:////app/instance/marvel_quiz.db
       - YANDEX_SKILL_ID=${YANDEX_SKILL_ID}
       - YANDEX_DIALOGS_OAUTH_TOKEN=${YANDEX_DIALOGS_OAUTH_TOKEN}
+      - YANDEX_STATIC_MAPS_API_KEY=${YANDEX_STATIC_MAPS_API_KEY}
     networks:
       - dokploy-network
     volumes:
