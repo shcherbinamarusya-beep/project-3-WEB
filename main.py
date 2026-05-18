@@ -47,10 +47,15 @@ def make_response(text, tts=None, end_session=False, buttons=None,
         response['buttons'] = [
             {'title': btn, 'hide': True} for btn in buttons
         ]
+
+    final_image_id = None
     if image_id:
+        final_image_id = get_or_upload_image(image_id)
+        
+    if final_image_id:
         response['card'] = {
             'type': 'BigImage',
-            'image_id': image_id,
+            'image_id': final_image_id,
             'title': image_title or 'Marvel Quiz',
             'description': image_desc if image_desc is not None else text,
         }
