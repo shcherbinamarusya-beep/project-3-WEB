@@ -226,19 +226,19 @@ def advance_after_answer(user_session, question, feedback_text, feedback_tts):
 
     map_url = get_yandex_maps_url(question.latitude, question.longitude, question.city_name)
  
-        if map_url:
-            if map_image_id:
-                feedback_text += f'\n\nПоказываю место на карте: {question.city_name}.'
-                feedback_tts += f' Показываю место на карте: {question.city_name}.'
-            else:
-                feedback_text += f'\n\nМесто на карте: {question.city_name}.'
-                feedback_tts += f' Место на карте: {question.city_name}.'
-            logger.info('Место на карте для города %s: %s', question.city_name, map_url)
-                        buttons.append({
-                'title': 'Показать место на карте',
-                'url': map_url,
-                'hide': False,
-            })
+    if map_url:
+        if map_image_id:
+            feedback_text += f'\n\nПоказываю место на карте: {question.city_name}.'
+            feedback_tts += f' Показываю место на карте: {question.city_name}.'
+        else:
+            feedback_text += f'\n\nМесто на карте: {question.city_name}.'
+            feedback_tts += f' Место на карте: {question.city_name}.'
+        logger.info('Место на карте для города %s: %s', question.city_name, map_url)
+        buttons.append({
+            'title': 'Показать место на карте',
+            'url': map_url,
+            'hide': False,
+})
 
     user_session.current_question_index += 1
     db.session.commit()
