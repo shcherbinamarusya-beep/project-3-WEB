@@ -37,7 +37,8 @@ SOUNDS = {
 
 
 def make_response(text, tts=None, end_session=False, buttons=None,
-                  image_id=None, image_title=None, image_desc=None):
+                  image_id=None, image_title=None, image_desc=None,
+                  card_button=None):):
     response = {
         'text': text,
         'tts': tts or text,
@@ -61,12 +62,15 @@ def make_response(text, tts=None, end_session=False, buttons=None,
         final_image_id = get_or_upload_image(image_id)
         
     if final_image_id:
-        response['card'] = {
+        card = {
             'type': 'BigImage',
             'image_id': final_image_id,
             'title': image_title or 'Marvel Quiz',
             'description': image_desc if image_desc is not None else text,
         }
+        if card_button:
+            card['button'] = card_button
+        response['card'] = card
     return {'response': response, 'version': '1.0'}
 
 
@@ -200,6 +204,10 @@ def handle_mode_choice(user_session, user_input):
 
 
 def handle_answer(user_session, user_input):
+    if is_map_request(user_input):
+        map_response = handle_previous_map_request(user_session)
+        if map_response:
+            return map_response
     question = GameLogic.get_current_question(user_session)
     if not question:
         return finalize_game(user_session)
@@ -244,7 +252,82 @@ def handle_hint(question):
         buttons=['Пропустить'],
         image_id=IMAGES['marvel']
     ))
+def is_map_request(user_input):
+    return any(phrase in user_input for phrase in (
+        'показать на карте',
+        'показать на картах',
+        'покажи на карте',
+        'покажи на картах',
+        'открыть карту',
+        'открой карту',
+        'где это',
+        'карта',
+    ))
 
+
+def get_previous_city_question(user_session):
+    question_ids = user_session.get_question_ids()
+    previous_index = user_session.current_question_index - 1
+    if previous_index < 0 or previous_index >= len(question_ids):
+        return None
+
+    question = Question.query.get(question_ids[previous_index])
+    if (
+        question
+        and question.question_type == 'city'
+        and question.latitude is not None
+        and question.longitude is not None
+    ):
+        return question
+    return None
+
+
+def build_map_button(map_url):
+    return {
+        'title': 'Открыть Яндекс.Карты',
+        'url': map_url,
+        'hide': False,
+    }
+
+
+def build_card_button(city_name, map_url):
+    return {
+        'text': f'Открыть карту: {city_name}',
+        'url': map_url,
+    }
+
+
+def handle_previous_map_request(user_session):
+    question = get_previous_city_question(user_session)
+    if not question:
+        return None
+
+    map_url = get_yandex_maps_url(
+        question.latitude,
+        question.longitude,
+        question.city_name,
+    )
+    if not map_url:
+        return None
+
+    map_image_id = None
+    static_map_url = get_static_map_url(
+        question.latitude,
+        question.longitude,
+        question.city_name,
+    )
+    if static_map_url:
+        map_image_id = upload_image_by_url(static_map_url)
+
+    text = f'Показываю место на карте: {question.city_name}.'
+    return jsonify(make_response(
+        text,
+        buttons=[build_map_button(map_url), 'Подсказка', 'Пропустить'],
+        image_id=map_image_id,
+        image_title=f'Место на карте: {question.city_name}',
+        image_desc=text,
+        card_button=build_card_button(question.city_name, map_url),
+    ))
 
 def advance_after_answer(user_session, question, feedback_text, feedback_tts):
     buttons = []
@@ -283,11 +366,7 @@ def advance_after_answer(user_session, question, feedback_text, feedback_tts):
             feedback_text += f'\n\nМесто на карте: {question.city_name}.'
             feedback_tts += f' Место на карте: {question.city_name}.'
         logger.info('Место на карте для города %s: %s', question.city_name, map_url)
-        buttons.append({
-            'title': 'Показать место на карте',
-            'url': map_url,
-            'hide': False,
-})
+        buttons.append(build_map_button(map_url))
 
     user_session.current_question_index += 1
     db.session.commit()
@@ -302,7 +381,8 @@ def advance_after_answer(user_session, question, feedback_text, feedback_tts):
             buttons=buttons + ['Сыграть ещё раз', 'Выйти'],
             image_id=map_image_id or IMAGES['result'],
             image_title=map_image_title or f'Результат: {user_session.score} из {len(questions_list)}',
-            image_desc=result_text
+            image_desc=result_text,
+            card_button=build_card_button(question.city_name, map_url) if map_url else None,
         ))
 
     next_question = GameLogic.get_current_question(user_session)
@@ -314,6 +394,8 @@ def advance_after_answer(user_session, question, feedback_text, feedback_tts):
         extra_buttons=buttons,
         image_id=map_image_id,
         image_title=map_image_title,
+        map_url=map_url,
+        map_city_name=question.city_name,
     )
 
 
@@ -342,6 +424,8 @@ def ask_question(
     extra_buttons=None,
     image_id=None,
     image_title=None,
+    map_url=None,
+    map_city_name=None,
 ):
     questions_list = json.loads(user_session.questions_json)
     q_num = user_session.current_question_index + 1
@@ -366,7 +450,8 @@ def ask_question(
         buttons=(extra_buttons or []) + ['Подсказка', 'Пропустить'],
         image_id=image_id or IMAGES['marvel'],
         image_title=image_title or f'Вопрос {q_num} из {total}',
-        image_desc=full_text
+        image_desc=full_text,
+        card_button=build_card_button(map_city_name, map_url) if map_url else None,
     ))
 
 
