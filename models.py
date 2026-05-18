@@ -1,5 +1,4 @@
 import json
-import random
 from database import db
 
 
