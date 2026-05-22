@@ -23,10 +23,10 @@ if not app.config['SECRET_KEY']:
 
 
 IMAGES = {
-    'marvel': 'https://litter.catbox.moe/4tqgs8.jpeg',
-    'correct': 'https://litter.catbox.moe/3l61od.jpeg',
-    'wrong': 'https://litter.catbox.moe/d4wz28.jpeg',
-    'result': 'https://litter.catbox.moe/qi8yvw.jpeg'
+    'marvel': '14236656/5239246c59b037d3d295',
+    'correct': '997614/da5ef12ab406bbef571e',
+    'wrong': '1540737/e654c5b01af48e9288f0',
+    'result': '14236656/5239246c59b037d3d295'
 }
 
 SOUNDS = {
