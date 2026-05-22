@@ -74,17 +74,26 @@ def make_response(text, tts=None, end_session=False, buttons=None,
     return {'response': response, 'version': '1.0'}
 
 
-def get_or_upload_image(image_id):
-    if isinstance(image_id, str) and image_id.startswith(('http://', 'https://')):
-        uploaded_image_id = upload_image_by_url(image_id)
+def get_or_upload_image(image_identifier):
+    # Если это уже ID загруженного изображения (не URL)
+    if isinstance(image_identifier, str) and not image_identifier.startswith(('http://', 'https://')):
+        # Это уже идентификатор, возвращаем как есть
+        return image_identifier
+    
+    # Если это URL, загружаем изображение
+    if isinstance(image_identifier, str) and image_identifier.startswith(('http://', 'https://')):
+        uploaded_image_id = upload_image_by_url(image_identifier)
         if uploaded_image_id:
             return uploaded_image_id
-        logger.warning('Image URL could not be uploaded and will be skipped: %s', image_id)
+        logger.warning('Image URL could not be uploaded and will be skipped: %s', image_identifier)
         return None
+    
+    return None
+
 
 def init_images():
-    for image_url in IMAGES.values():
-        get_or_upload_image(image_url)
+    for image_identifier in IMAGES.values():
+        get_or_upload_image(image_identifier)
 
 
 def bootstrap_app():
